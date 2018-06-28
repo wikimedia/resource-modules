@@ -1,5 +1,5 @@
 {
-  "name": "resource-modules",
+  "name": "@wikimedia/resource-modules",
   "version": "2.1.0",
   "description": "",
   "main": "dist/cli.js",
