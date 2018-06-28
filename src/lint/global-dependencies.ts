@@ -8,13 +8,13 @@ import { getDependenciesWithFile } from "./helpers";
 const globalIdBlacklist: string[] = [];
 
 const defaultFiles = [
-  "resources/src/mediawiki/mediawiki.js",
+  "resources/src/startup/mediawiki.js",
   "resources/src/mediawiki.base/mediawiki.base.js",
   "resources/src/mediawiki.util.js",
-  "resources/src/mediawiki/mediawiki.log.js",
-  "resources/src/startup.js",
+  "resources/src/startup/mediawiki.log.js",
+  "resources/src/startup/startup.js",
   "resources/src/mediawiki.template.js",
-  "resources/src/mediawiki/mediawiki.requestIdleCallback.js",
+  "resources/src/startup/mediawiki.requestIdleCallback.js",
   "resources/src/mediawiki.language/mediawiki.language.init.js"
 ];
 
