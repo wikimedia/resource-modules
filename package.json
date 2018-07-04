@@ -31,8 +31,5 @@
     "escodegen": "^1.9.0",
     "recursive-readdir": "^2.2.1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/joakin/resource-modules.git"
-  }
+  "repository": "github:wikimedia/resource-modules"
 }
