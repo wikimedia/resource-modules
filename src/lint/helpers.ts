@@ -15,16 +15,18 @@ export function getDependenciesWithFile(
 
   if (module.dependencies) {
     if (Array.isArray(module.dependencies)) {
-      module.dependencies.forEach((dep: string): void => {
-        found = found.concat(
-          getDependenciesWithFile(
-            scriptToFind,
-            dep,
-            resourceModules[dep],
-            resourceModules
-          )
-        );
-      });
+      module.dependencies.forEach(
+        (dep: string): void => {
+          found = found.concat(
+            getDependenciesWithFile(
+              scriptToFind,
+              dep,
+              resourceModules[dep],
+              resourceModules
+            )
+          );
+        }
+      );
     } else if (typeof module.dependencies === "string") {
       found = found.concat(
         getDependenciesWithFile(
@@ -67,11 +69,13 @@ export function getDependenciesWithMessage(
 
   if (module.dependencies) {
     if (Array.isArray(module.dependencies)) {
-      module.dependencies.forEach((dep: string): void => {
-        found = found.concat(
-          getDependenciesWithMessage(msgToFind, dep, resourceModules)
-        );
-      });
+      module.dependencies.forEach(
+        (dep: string): void => {
+          found = found.concat(
+            getDependenciesWithMessage(msgToFind, dep, resourceModules)
+          );
+        }
+      );
     } else if (typeof module.dependencies === "string") {
       found = found.concat(
         getDependenciesWithMessage(

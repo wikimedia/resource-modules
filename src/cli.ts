@@ -51,9 +51,7 @@ function main(
 
     // Get all ResourceModules definitions
     Promise.all([
-      getJSON(dir, json).then(
-        json => (<ExtensionJson>json).ResourceModules
-      ),
+      getJSON(dir, json).then(json => (<ExtensionJson>json).ResourceModules),
       getPhpConfig(coreDir, coreResources)
     ]).then(
       ([ext, core]: [ResourceModules, ResourceModules]): ResourceModules =>
@@ -91,8 +89,9 @@ function analyzeJSFiles(
   return (
     getJSFiles(dir, resources)
       // Analyze the JS files
-      .then((jsFiles: string[]): Promise<Analysis> =>
-        analyzeFiles(dir, jsFiles, visitors, printAnalysisErrors)
+      .then(
+        (jsFiles: string[]): Promise<Analysis> =>
+          analyzeFiles(dir, jsFiles, visitors, printAnalysisErrors)
       )
   );
 }

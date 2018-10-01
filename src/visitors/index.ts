@@ -27,11 +27,13 @@ interface ByKey {
 function combineVisitors(visitors: VisitorMap<State>[]): VisitorMap<State> {
   let byKey: ByKey = visitors.reduce(
     (a: ByKey, obj: VisitorMap<State>): ByKey => {
-      Object.keys(obj).forEach((nodeType: string): void => {
-        const visitor: Visitor<State> = obj[nodeType];
-        a[nodeType] = a[nodeType] || [];
-        a[nodeType].push(visitor);
-      });
+      Object.keys(obj).forEach(
+        (nodeType: string): void => {
+          const visitor: Visitor<State> = obj[nodeType];
+          a[nodeType] = a[nodeType] || [];
+          a[nodeType].push(visitor);
+        }
+      );
       return a;
     },
     {}

@@ -9,8 +9,9 @@ export function getJSFiles(
   return (
     getFiles(path.join(dir, assetsFolder))
       // Remove folder prefix and filter only JS files
-      .then((files: string[]): string[] =>
-        files.map(replace(dir + path.sep, "")).filter(isValidJSFile)
+      .then(
+        (files: string[]): string[] =>
+          files.map(replace(dir + path.sep, "")).filter(isValidJSFile)
       )
   );
 }
@@ -47,9 +48,11 @@ export function getSources(dir: string, files: string[]): Promise<Sources> {
   let mfiles: Sources = {};
   return Promise.all(
     files.map(f =>
-      getSource(dir, f).then((source: string): void => {
-        mfiles[f] = { source };
-      })
+      getSource(dir, f).then(
+        (source: string): void => {
+          mfiles[f] = { source };
+        }
+      )
     )
   ).then(() => mfiles);
 }

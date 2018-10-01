@@ -46,10 +46,12 @@ export default function getGlobalDependenciesErrors(
               analysis.files
             )
               // Get name and analysis paired
-              .map((fileName: string): FileAndAnalysis => [
-                fileName,
-                analysis.files[fileName]
-              ]);
+              .map(
+                (fileName: string): FileAndAnalysis => [
+                  fileName,
+                  analysis.files[fileName]
+                ]
+              );
 
             // Find out which file defines as ns
             const whoDefinesAsNamespace: FileAndAnalysis[] = fileAndAnalysis.filter(
@@ -182,36 +184,38 @@ function checkDefinerFile(
 
   // Only if it is NOT one of the included by default in mediawiki
   if (!isDefaultMediawikiFile(definer)) {
-    inModules.forEach(([name, module]: Module): void => {
-      // Script defined before me, or check my dependencies for it
-      const inDependencies: string[] = getDependenciesWithFile(
-        definer,
-        name,
-        module,
-        resourceModules
-      )
-        // Unique
-        .filter((v, i, arr) => arr.indexOf(v) === i);
-      if (inDependencies.length > 1) {
-        pushUniq(
-          {
-            kind: "file_in_multiple_dependencies",
-            id: globalId,
-            where: [definer, inDependencies.sort()]
-          },
-          errs
-        );
-      } else if (inDependencies.length === 0) {
-        pushUniq(
-          {
-            kind: "not_found",
-            id: globalId,
-            where: definer
-          },
-          errs
-        );
+    inModules.forEach(
+      ([name, module]: Module): void => {
+        // Script defined before me, or check my dependencies for it
+        const inDependencies: string[] = getDependenciesWithFile(
+          definer,
+          name,
+          module,
+          resourceModules
+        )
+          // Unique
+          .filter((v, i, arr) => arr.indexOf(v) === i);
+        if (inDependencies.length > 1) {
+          pushUniq(
+            {
+              kind: "file_in_multiple_dependencies",
+              id: globalId,
+              where: [definer, inDependencies.sort()]
+            },
+            errs
+          );
+        } else if (inDependencies.length === 0) {
+          pushUniq(
+            {
+              kind: "not_found",
+              id: globalId,
+              where: definer
+            },
+            errs
+          );
+        }
       }
-    });
+    );
   }
 }
 
