@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as path from "path";
+import { readFileSync } from "fs";
 
 import visitors from "./visitors";
 import { getJSFiles, getJSON } from "./fs";
@@ -19,13 +20,28 @@ if (process.argv.length >= 3) {
   const extensionPath = path.resolve(process.argv[2]);
   const corePath = path.resolve(path.join(extensionPath, "../.."));
   const jsonFilename = process.argv[3] || "extension.json";
-  main(corePath, extensionPath, jsonFilename);
+  let ignoreList: string[];
+  // load the list of ignored files
+  try {
+    ignoreList = readFileSync(`${extensionPath}/.resource-modules-ignore`)
+      .toString()
+      .split("\n")
+      .filter(filename => filename !== "");
+  } catch (e) {
+    ignoreList = [];
+  }
+  main(corePath, extensionPath, jsonFilename, ignoreList);
 } else {
   console.log("I need a parameter with the path to the extension");
   process.exit(1);
 }
 
-function main(coreDir: string, dir: string, json: string): void {
+function main(
+  coreDir: string,
+  dir: string,
+  json: string,
+  ignoreList: string[]
+): void {
   Promise.all([
     // Get frontend assets
     analyzeJSFiles(dir, frontendAssets, true),
@@ -57,7 +73,7 @@ function main(coreDir: string, dir: string, json: string): void {
         // }, null, 2))
 
         const errors = lint(ana, coreAna, resourceModules);
-        const exit = logErrors(errors);
+        const exit = logErrors(errors, ignoreList);
         process.exit(exit);
       }
     )
