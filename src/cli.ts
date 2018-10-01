@@ -15,16 +15,17 @@ const RESOURCES = "/resources";
 const frontendAssets = RESOURCES;
 const coreResources = `${RESOURCES}/Resources.php`;
 
-if (process.argv.length === 3) {
+if (process.argv.length >= 3) {
   const extensionPath = path.resolve(process.argv[2]);
   const corePath = path.resolve(path.join(extensionPath, "../.."));
-  main(corePath, extensionPath);
+  const jsonFilename = process.argv[3] || "extension.json";
+  main(corePath, extensionPath, jsonFilename);
 } else {
   console.log("I need a parameter with the path to the extension");
   process.exit(1);
 }
 
-function main(coreDir: string, dir: string): void {
+function main(coreDir: string, dir: string, json: string): void {
   Promise.all([
     // Get frontend assets
     analyzeJSFiles(dir, frontendAssets, true),
@@ -34,7 +35,7 @@ function main(coreDir: string, dir: string): void {
 
     // Get all ResourceModules definitions
     Promise.all([
-      getJSON(dir, "extension.json").then(
+      getJSON(dir, json).then(
         json => (<ExtensionJson>json).ResourceModules
       ),
       getPhpConfig(coreDir, coreResources)
