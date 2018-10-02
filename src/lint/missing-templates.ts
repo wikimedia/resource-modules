@@ -14,24 +14,26 @@ export default function getMissingTemplatesErrors(
     return ana.templates.reduce(
       (errs: MissingTemplate[], template: Template): MissingTemplate[] => {
         // Modules with missing templates
-        const missing = inModules.filter(([name, module]: Module): boolean => {
-          if (template.module === name) {
-            if (!module.templates) return true;
-            if (module.templates.constructor === Object) {
-              return !Object.keys(module.templates).some(
-                tplName => tplName === template.fileName
+        const missing = inModules.filter(
+          ([name, module]: Module): boolean => {
+            if (template.module === name) {
+              if (!module.templates) return true;
+              if (module.templates.constructor === Object) {
+                return !Object.keys(module.templates).some(
+                  tplName => tplName === template.fileName
+                );
+              }
+              throw new Error(`In module ${name}, templates is not an object`);
+            } else {
+              const submoduleTemplates =
+                resourceModules[template.module] &&
+                resourceModules[template.module].templates;
+              return !(
+                submoduleTemplates && submoduleTemplates[<any>template.fileName]
               );
             }
-            throw new Error(`In module ${name}, templates is not an object`);
-          } else {
-            const submoduleTemplates =
-              resourceModules[template.module] &&
-              resourceModules[template.module].templates;
-            return !(
-              submoduleTemplates && submoduleTemplates[<any>template.fileName]
-            );
           }
-        });
+        );
         if (missing.length > 0) {
           errs.push({
             kind: "template_not_in_modules",

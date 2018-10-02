@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as path from "path";
+import { readFileSync } from "fs";
 
 import visitors from "./visitors";
 import { getJSFiles, getJSON } from "./fs";
@@ -15,16 +16,38 @@ const RESOURCES = "/resources";
 const frontendAssets = RESOURCES;
 const coreResources = `${RESOURCES}/Resources.php`;
 
-if (process.argv.length === 3) {
-  const extensionPath = path.resolve(process.argv[2]);
+const args = process.argv;
+if (args.length === 3 || args.length === 4) {
+  const extensionPath = path.resolve(args[2]);
   const corePath = path.resolve(path.join(extensionPath, "../.."));
-  main(corePath, extensionPath);
+  const jsonFilename = args[3] || "extension.json";
+  let ignoreList: string[];
+  // load the list of ignored files
+  try {
+    ignoreList = readFileSync(`${extensionPath}/.resource-modules-ignore`)
+      .toString()
+      .split("\n")
+      .filter(filename => filename !== "");
+  } catch (e) {
+    ignoreList = [];
+  }
+  main(corePath, extensionPath, jsonFilename, ignoreList);
 } else {
-  console.log("I need a parameter with the path to the extension");
+  console.log(`I need a parameter with the path to the extension.
+Usage:
+* {string} extensionPath to extension or skin repository
+* {string} [jsonFilename] of repo e.g. extension.json or skin.json
+e.g. resource_modules /srv/mediawiki/skins/MySkin skin.json
+`);
   process.exit(1);
 }
 
-function main(coreDir: string, dir: string): void {
+function main(
+  coreDir: string,
+  dir: string,
+  json: string,
+  ignoreList: string[]
+): void {
   Promise.all([
     // Get frontend assets
     analyzeJSFiles(dir, frontendAssets, true),
@@ -34,9 +57,7 @@ function main(coreDir: string, dir: string): void {
 
     // Get all ResourceModules definitions
     Promise.all([
-      getJSON(dir, "extension.json").then(
-        json => (<ExtensionJson>json).ResourceModules
-      ),
+      getJSON(dir, json).then(json => (<ExtensionJson>json).ResourceModules),
       getPhpConfig(coreDir, coreResources)
     ]).then(
       ([ext, core]: [ResourceModules, ResourceModules]): ResourceModules =>
@@ -56,7 +77,7 @@ function main(coreDir: string, dir: string): void {
         // }, null, 2))
 
         const errors = lint(ana, coreAna, resourceModules);
-        const exit = logErrors(errors);
+        const exit = logErrors(errors, ignoreList);
         process.exit(exit);
       }
     )
@@ -74,8 +95,9 @@ function analyzeJSFiles(
   return (
     getJSFiles(dir, resources)
       // Analyze the JS files
-      .then((jsFiles: string[]): Promise<Analysis> =>
-        analyzeFiles(dir, jsFiles, visitors, printAnalysisErrors)
+      .then(
+        (jsFiles: string[]): Promise<Analysis> =>
+          analyzeFiles(dir, jsFiles, visitors, printAnalysisErrors)
       )
   );
 }

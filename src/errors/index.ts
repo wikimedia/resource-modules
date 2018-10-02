@@ -3,8 +3,12 @@ import { Errors, FileErrors, MissingMessage } from "../lint/types";
 type FileAndErrors = [string, FileErrors];
 
 // Returns success or error code as an int if it has logged errors out
-export default function logErrors(errors: Errors): number {
+export default function logErrors(
+  allErrors: Errors,
+  ignoreFiles: string[]
+): number {
   let exit = 0;
+  const errors = filterFiles(allErrors, ignoreFiles);
 
   logWarnings(errors);
 
@@ -20,6 +24,19 @@ export default function logErrors(errors: Errors): number {
   });
 
   return exit;
+}
+
+function filterFiles(errors: Errors, ignoreFiles: string[]) {
+  return Object.assign({}, errors, {
+    files: Object.keys(errors.files)
+      // Reduce all files to files not in the ignoreFiles list
+      .filter(filename => ignoreFiles.indexOf(filename) === -1)
+      // and reduce them
+      .reduce(
+        (res, key) => Object.assign(res, { [key]: errors.files[key] }),
+        {}
+      )
+  });
 }
 
 function logWarnings(errors: Errors): void {

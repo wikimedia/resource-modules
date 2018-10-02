@@ -43,26 +43,28 @@ export default function getDependenciesErrors(
 
           // Traverse dependencies of the RLModules where source file is used
           // and check file that defines is there somewhere
-          inModules.forEach(([name, module]: Module): void => {
-            // Script defined before me, or check my dependencies for it
-            const inDependencies: string[] = getDependenciesWithFile(
-              definer,
-              name,
-              module,
-              resourceModules
-            )
-              .filter((v, i, arr) => arr.indexOf(v) === i)
-              .sort();
-            if (inDependencies.length > 1) {
-              errs.push({
-                kind: "file_in_multiple_dependencies",
-                id: mfId,
-                where: [definer, inDependencies]
-              });
-            } else if (inDependencies.length === 0) {
-              errs.push({ kind: "not_found", id: mfId, where: definer });
+          inModules.forEach(
+            ([name, module]: Module): void => {
+              // Script defined before me, or check my dependencies for it
+              const inDependencies: string[] = getDependenciesWithFile(
+                definer,
+                name,
+                module,
+                resourceModules
+              )
+                .filter((v, i, arr) => arr.indexOf(v) === i)
+                .sort();
+              if (inDependencies.length > 1) {
+                errs.push({
+                  kind: "file_in_multiple_dependencies",
+                  id: mfId,
+                  where: [definer, inDependencies]
+                });
+              } else if (inDependencies.length === 0) {
+                errs.push({ kind: "not_found", id: mfId, where: definer });
+              }
             }
-          });
+          );
         }
 
         return errs;
