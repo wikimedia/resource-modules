@@ -16,10 +16,11 @@ const RESOURCES = "/resources";
 const frontendAssets = RESOURCES;
 const coreResources = `${RESOURCES}/Resources.php`;
 
-if (process.argv.length >= 3) {
-  const extensionPath = path.resolve(process.argv[2]);
+const args = process.argv;
+if (args.length === 3 || args.length === 4) {
+  const extensionPath = path.resolve(args[2]);
   const corePath = path.resolve(path.join(extensionPath, "../.."));
-  const jsonFilename = process.argv[3] || "extension.json";
+  const jsonFilename = args[3] || "extension.json";
   let ignoreList: string[];
   // load the list of ignored files
   try {
@@ -32,7 +33,12 @@ if (process.argv.length >= 3) {
   }
   main(corePath, extensionPath, jsonFilename, ignoreList);
 } else {
-  console.log("I need a parameter with the path to the extension");
+  console.log(`I need a parameter with the path to the extension.
+Usage:
+* {string} extensionPath to extension or skin repository
+* {string} [jsonFilename] of repo e.g. extension.json or skin.json
+e.g. resource_modules /srv/mediawiki/skins/MySkin skin.json
+`);
   process.exit(1);
 }
 
